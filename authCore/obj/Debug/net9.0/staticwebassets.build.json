@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "SZDHThauXRLdrN1fhnfCi2pKt6XiTqu4sqSZAPSh3S8=",
+  "Source": "AuthCore",
+  "BasePath": "_content/AuthCore",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
