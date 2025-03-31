@@ -60,10 +60,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 
-app.MapGet("/", () => "Welcome to the API!");
-
 // Google Login Route
-app.MapGet("/login-google", async (HttpContext context) =>
+app.MapGet("/", async (HttpContext context) =>
 {
     await context.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties
     {

@@ -1,5 +1,4 @@
 /Users/ishmeetsingh/github/github-repositories/backend-microservices/authCore/bin/Debug/net9.0/appsettings.Development.json
-/Users/ishmeetsingh/github/github-repositories/backend-microservices/authCore/bin/Debug/net9.0/appsettings.json
 /Users/ishmeetsingh/github/github-repositories/backend-microservices/authCore/bin/Debug/net9.0/AuthCore.staticwebassets.endpoints.json
 /Users/ishmeetsingh/github/github-repositories/backend-microservices/authCore/bin/Debug/net9.0/AuthCore
 /Users/ishmeetsingh/github/github-repositories/backend-microservices/authCore/bin/Debug/net9.0/AuthCore.deps.json
@@ -50,3 +49,4 @@
 /Users/ishmeetsingh/github/github-repositories/backend-microservices/authCore/obj/Debug/net9.0/AuthCore.pdb
 /Users/ishmeetsingh/github/github-repositories/backend-microservices/authCore/obj/Debug/net9.0/AuthCore.genruntimeconfig.cache
 /Users/ishmeetsingh/github/github-repositories/backend-microservices/authCore/obj/Debug/net9.0/ref/AuthCore.dll
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/authCore/bin/Debug/net9.0/appsettings.template.json
