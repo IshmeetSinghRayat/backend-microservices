@@ -51,25 +51,25 @@ Description: Redirects user to Google authentication page.
 
 curl -X GET http://localhost:5197/login-google
 
-🔹 2. Google Callback
+2. Google Callback
 
 URL: GET /signin-google
 Description: Handles Google OAuth callback, issues a JWT token.
 
-🔹 3. Get User Profile
+3. Get User Profile
 
 URL: GET /profileDescription: Returns authenticated user details.Headers:
 
 Authorization: Bearer <JWT-TOKEN>
 
-🔹 4. Protected API Route
+4. Protected API Route
 
 URL: GET /protected-route
 Description: Requires authentication via JWT token.Headers:
 
 Authorization: Bearer <JWT-TOKEN>
 
-🛠️ Tech Stack
+Tech Stack
 
 .NET 9 (Minimal API)
 
