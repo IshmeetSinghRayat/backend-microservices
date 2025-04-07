@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthCore", "authCore\AuthCore.csproj", "{81C36E17-B633-4CC5-A312-655A262CF6F8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{1E2F9BDB-4E6E-46AF-8DEC-0A7DE74C7DE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthLib", "libraries\AuthLib\AuthLib.csproj", "{1E8E19F9-6494-4BEC-B2B3-2D36318F66E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81C36E17-B633-4CC5-A312-655A262CF6F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81C36E17-B633-4CC5-A312-655A262CF6F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81C36E17-B633-4CC5-A312-655A262CF6F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81C36E17-B633-4CC5-A312-655A262CF6F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E8E19F9-6494-4BEC-B2B3-2D36318F66E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E8E19F9-6494-4BEC-B2B3-2D36318F66E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E8E19F9-6494-4BEC-B2B3-2D36318F66E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E8E19F9-6494-4BEC-B2B3-2D36318F66E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1E8E19F9-6494-4BEC-B2B3-2D36318F66E6} = {1E2F9BDB-4E6E-46AF-8DEC-0A7DE74C7DE9}
+	EndGlobalSection
+EndGlobal

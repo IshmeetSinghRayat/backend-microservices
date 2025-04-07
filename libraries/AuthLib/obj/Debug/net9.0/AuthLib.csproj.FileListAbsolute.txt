@@ -1,0 +1,13 @@
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/bin/Debug/net9.0/AuthLib.deps.json
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/bin/Debug/net9.0/AuthLib.dll
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/bin/Debug/net9.0/AuthLib.pdb
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/AuthLib.csproj.AssemblyReference.cache
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/AuthLib.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/AuthLib.AssemblyInfoInputs.cache
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/AuthLib.AssemblyInfo.cs
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/AuthLib.csproj.CoreCompileInputs.cache
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/AuthLib.sourcelink.json
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/AuthLib.dll
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/refint/AuthLib.dll
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/AuthLib.pdb
+/Users/ishmeetsingh/github/github-repositories/backend-microservices/libraries/AuthLib/obj/Debug/net9.0/ref/AuthLib.dll

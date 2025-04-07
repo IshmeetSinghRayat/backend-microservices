@@ -1,102 +1,116 @@
-Google Auth + Role-Based Access Control (RBAC) in .NET 9
+# AuthCore - Google Auth + JWT + SpiceDB Authorization
 
-Overview
+## Overview
 
-This project implements Google Authentication with JWT-based authentication and Role-Based Access Control (RBAC) in a .NET 9 Minimal API. The system allows users to log in using Google OAuth, generates a JWT token, and supports protected API routes that require authentication.
+This project implements Google Authentication with JWT-based authentication and SpiceDB-based authorization in a .NET 9 Minimal API. The system allows users to log in using Google OAuth, generates a JWT token, and uses SpiceDB for fine-grained permission checks.
 
-Features
+## Features
 
 1. Google Authentication via OAuth2
 2. JWT Authentication & Authorization
-3. Role-Based Access Control (RBAC)
+3. SpiceDB Integration for Fine-Grained Access Control
 4. Secure secret key management
 5. Supports both appsettings.json and environment variables for configuration
 6. Minimal API implementation in .NET 9
 
-Installation & Setup
+## Installation & Setup
 
 1. Clone the Repository
 
-git clone https://github.com/your-repo/google-auth-rbac-dotnet.git
-cd google-auth-rbac-dotnet
+```bash
+git clone https://github.com/your-repo/authcore.git
+cd authcore
+```
 
 2. Configure Google OAuth Credentials
 
 Go to Google Developer Console
 
-Create a new OAuth 2.0 Client ID
+- Create a new OAuth 2.0 Client ID
+- Set Authorized Redirect URI to: `https://localhost:7197/signin-google`
+- Copy the Client ID and Client Secret
 
-Set Authorized Redirect URI to:
+3. Configure SpiceDB
 
-http://localhost:5197/signin-google
+- Set up a SpiceDB instance
+- Get your API token and endpoint
 
-Copy the Client ID and Client Secret
+4. Set Environment Variables (Recommended for Security)
 
-3. Set Environment Variables (Recommended for Security)
-
+```bash
 export JWT_SECRET_KEY="secure-secret-key"
 export GOOGLE_CLIENT_ID="google-client-id"
 export GOOGLE_CLIENT_SECRET="google-client-secret"
+export SPICEDB_ENDPOINT="your-spicedb-endpoint"
+export SPICEDB_API_TOKEN="your-spicedb-token"
+```
 
-4. Run the Application
+5. Run the Application
 
+```bash
 dotnet run
+```
 
-API Endpoints
+## API Endpoints
 
 1. Google Login
 
 URL: GET /login-google
 Description: Redirects user to Google authentication page.
 
-curl -X GET http://localhost:5197/login-google
-
 2. Google Callback
 
 URL: GET /signin-google
-Description: Handles Google OAuth callback, issues a JWT token.
+Description: Handles Google OAuth callback, returns user claims.
 
-3. Get User Profile
+3. JWT Token Generation
 
-URL: GET /profileDescription: Returns authenticated user details.Headers:
+URL: GET /login
+Description: Generates a JWT token for authenticated users.
+Headers: Cookie with Google authentication
 
-Authorization: Bearer <JWT-TOKEN>
+4. Permission Check
 
-4. Protected API Route
+URL: GET /check-permission
+Description: Checks if a user has permission for a specific resource.
+Headers:
 
-URL: GET /protected-route
-Description: Requires authentication via JWT token.Headers:
+- Authorization: Bearer <JWT-TOKEN>
+  Query Parameters:
+- resource: The resource to check
+- permission: The permission to verify
 
-Authorization: Bearer <JWT-TOKEN>
+## Tech Stack
 
-Tech Stack
+- .NET 9 (Minimal API)
+- ASP.NET Core Authentication & Authorization
+- Google OAuth 2.0
+- JWT (JSON Web Token)
+- SpiceDB for Authorization
+- AuthLib (Custom Library)
 
-.NET 9 (Minimal API)
+## Project Structure
 
-ASP.NET Core Authentication & Authorization
-
-Google OAuth 2.0
-
-JWT (JSON Web Token)
-
-Role-Based Access Control (RBAC)
-
-Project Structure
-
+```
 authCore/
-├── Program.cs # Main application logic
-├── appsettings.json # Configuration file
-├── README.md # Documentation
+├── Program.cs              # Main application logic
+├── appsettings.json        # Configuration file
+├── AuthCore.csproj         # Project dependencies
+├── AuthCore.http           # API testing file
+└── README.md              # Documentation
+```
 
-Best Practices Implemented
+## Best Practices Implemented
 
-Environment Variables for Secrets (No hardcoded keys)
-JWT Authentication & Authorization
-OAuth Security Best Practices
-Minimal API for Simplicity & Performance
+- Environment Variables for Secrets
+- JWT Authentication & Authorization
+- OAuth Security Best Practices
+- Minimal API for Simplicity & Performance
+- SpiceDB Integration for Fine-Grained Access Control
 
-Next Steps
+## Next Steps
 
-Implement RBAC with Google Groups & Claims
-Store User Sessions in Redis for scalability
-Build a Frontend (React/Next.js) for UI Authentication
+- Implement more comprehensive permission checks
+- Add role-based access control using SpiceDB
+- Build a Frontend (React) for UI Authentication
+- Add Swagger/OpenAPI documentation

@@ -1,23 +1,30 @@
+using AuthLib;
+using Microsoft.Extensions.Configuration;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("https://localhost:7197");
 
-var googleOAuth = builder.Configuration.GetSection("GoogleOAuth");
+var config = builder.Configuration;
 
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession();
+builder.Services.AddSingleton<JWTService>(sp =>
+    new JWTService(
+        Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? config["JwtSettings:SecretKey"],
+        builder.Configuration["JwtSettings:Issuer"],
+        builder.Configuration["JwtSettings:Audience"]
+    ));
+
+builder.Services.AddSingleton<SpiceDBService>(sp =>
+    new SpiceDBService(
+        Environment.GetEnvironmentVariable("SPICEDB_ENDPOINT") ?? config["SpiceDB:Endpoint"],
+        Environment.GetEnvironmentVariable("SPICEDB_API_TOKEN") ?? config["SpiceDB:ApiToken"]
+    ));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -27,97 +34,96 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(options =>
 {
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.Name = "myApp.auth";
 })
 .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
 {
-    options.ClientId = googleOAuth["ClientId"];
-    options.ClientSecret = googleOAuth["ClientSecret"];
+    options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID") ?? config["GoogleOAuth:ClientId"];
+    options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") ?? config["GoogleOAuth:ClientSecret"];
     options.CallbackPath = "/signin-google";
     options.SaveTokens = true;
-})
-.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-        ValidAudience = builder.Configuration["JwtSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!))
-    };
 });
 
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
-// Google Login Route
-app.MapGet("/", async (HttpContext context) =>
-{
-    await context.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties
-    {
-        RedirectUri = "/profile"
-    });
-});
+app.MapGet("/", () => "Welcome to AuthCore!!!!!");
 
-app.MapGet("/profile", async (HttpContext context) =>
+app.MapGet("/login", async (HttpContext context, JWTService jwtService) =>
 {
-    var user = context.User;
-    if (!user.Identity.IsAuthenticated)
+    if (!context.User.Identity.IsAuthenticated)
     {
         return Results.Unauthorized();
     }
 
-    var claims = user.Claims.Select(c => new { c.Type, c.Value });
-    return Results.Json(new { Message = "Authenticated", Claims = claims });
-}).RequireAuthorization();
+    var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var email = context.User.FindFirst(ClaimTypes.Email)?.Value;
+
+    if (string.IsNullOrEmpty(userId))
+    {
+        return Results.Unauthorized();
+    }
+
+    var jwtToken = jwtService.GenerateToken(userId);
+
+    return Results.Ok(new { Token = jwtToken });
+});
+
+app.MapGet("/login-google", async (HttpContext context) =>
+{
+    await context.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties
+    {
+        RedirectUri = "/login"
+    });
+});
 
 app.MapGet("/signin-google", async (HttpContext context) =>
 {
-    var result = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    if (result.Succeeded)
+    var result = await context.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+    if (!result.Succeeded)
     {
-        var user = result.Principal;
-        var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.FindFirst(ClaimTypes.NameIdentifier)?.Value!),
-            new Claim(JwtRegisteredClaimNames.Email, user.FindFirst(ClaimTypes.Email)?.Value!)
-        };
-
-        var jwt = new JwtSecurityToken(
-            issuer: builder.Configuration["JwtSettings:Issuer"],
-            audience: builder.Configuration["JwtSettings:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(60),
-            signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!)),
-                SecurityAlgorithms.HmacSha256)
-        );
-
-        var token = new JwtSecurityTokenHandler().WriteToken(jwt);
-        return Results.Json(new { token });
+        var failure = result.Failure?.Message ?? "Unknown reason";
+        return Results.Unauthorized();
     }
 
-    return Results.Unauthorized();
+    await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, result.Principal);
+
+    var claims = result.Principal?.Identities.FirstOrDefault()?.Claims
+        .Select(claim => new { claim.Type, claim.Value });
+
+    return Results.Ok(claims);
 });
 
-app.MapGet("/protected-route", (HttpContext context) =>
+app.MapGet("/check-permission", async (
+    HttpContext context,
+    string resource,
+    string permission,
+    SpiceDBService spiceDBService,
+    JWTService jwtService) =>
 {
-    var user = context.User;
-    if (user.Identity?.IsAuthenticated ?? false)
+    var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+    if (!jwtService.ValidateToken(token))
     {
-        return Results.Json(new { message = "Welcome, authenticated user!" });
+        return Results.Unauthorized();
     }
-    return Results.Unauthorized();
-}).RequireAuthorization(JwtBearerDefaults.AuthenticationScheme);
+    var handler = new JwtSecurityTokenHandler();
+    var jwtToken = handler.ReadJwtToken(token);
+    var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value;
+
+
+    var hasPermission = await spiceDBService.CheckPermissionAsync(userId, resource, permission);
+
+    Console.WriteLine("has permission: " + hasPermission);
+
+    return hasPermission ? Results.Ok("Permission granted") : Results.Unauthorized();
+});
+
 
 app.Run();
